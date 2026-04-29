@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Experiences · Apex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --left-bg:      #0C0F1A;
+      --left-card:    #141828;
+      --left-border:  rgba(255,255,255,0.07);
+      --left-text:    #F1F5F9;
+      --left-muted:   #64748B;
+      --left-faint:   #334155;
+      --accent:       #F43F5E;
+      --accent-glow:  rgba(244,63,94,0.15);
+      --green:        #22C55E;
+      --right-bg:     #F8FAFC;
+      --right-card:   #FFFFFF;
+      --right-border: #E2E8F0;
+      --right-text:   #0F172A;
+      --right-muted:  #64748B;
+      --right-faint:  #94A3B8;
+    }
+
+    html, body { height: 100%; }
+    body {
+      padding-top: 44px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      background: var(--right-bg);
+    }
+
+    /* ─────────────── PAGE NAV ─────────────── */
+    .page-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      height: 44px;
+      background: #05050C;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 2px;
+    }
+    .page-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--left-muted);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .page-tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .page-tab:hover { color: var(--left-text); background: rgba(255,255,255,0.05); }
+    .page-tab.active { color: var(--left-text); background: rgba(255,255,255,0.08); }
+
+    /* ─────────────── LAYOUT ─────────────── */
+    .layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* ─────────────── LEFT PANEL ─────────────── */
+    .left {
+      width: 42%;
+      min-width: 340px;
+      background: var(--left-bg);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 44px;
+      height: calc(100vh - 44px);
+      overflow-y: auto;
+      padding: 40px 36px;
+      gap: 32px;
+    }
+
+    /* Brand */
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-mark svg { width: 18px; height: 18px; }
+    .brand-name {
+      font-size: 17px; font-weight: 700;
+      color: var(--left-text); letter-spacing: -0.3px;
+    }
+    .brand-sep {
+      width: 1px; height: 16px;
+      background: var(--left-border);
+      margin: 0 4px;
+    }
+    .brand-sub {
+      font-size: 11px; font-weight: 500;
+      color: var(--left-muted);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .cp-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+    /* Main copy */
+    .left-copy h1 {
+      font-size: 26px; font-weight: 800;
+      color: var(--left-text); line-height: 1.2;
+      letter-spacing: -0.6px; margin-bottom: 10px;
+    }
+    .left-copy h1 span { color: var(--accent); }
+    .left-copy p {
+      font-size: 14px; color: var(--left-muted);
+      line-height: 1.7;
+    }
+
+    /* Feature list */
+    .feature-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13.5px; color: var(--left-muted); line-height: 1.5;
+    }
+    .chk {
+      width: 18px; height: 18px; min-width: 18px;
+      background: rgba(244,63,94,0.1);
+      border: 1px solid rgba(244,63,94,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .chk svg { width: 10px; height: 10px; }
+
+    /* Stat badges */
+    .stat-row {
+      display: flex; gap: 12px;
+    }
+    .stat-badge {
+      flex: 1;
+      background: var(--left-card);
+      border: 1px solid var(--left-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .stat-num {
+      font-size: 22px; font-weight: 800;
+      color: var(--left-text); letter-spacing: -0.5px;
+    }
+    .stat-num span { color: var(--accent); }
+    .stat-label {
+      font-size: 11.5px; color: var(--left-muted);
+      margin-top: 3px; line-height: 1.4;
+    }
+
+    /* Powered-by badge */
+    .powered-by {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      background: rgba(244,63,94,0.06);
+      border: 1px solid rgba(244,63,94,0.15);
+      border-radius: 10px;
+    }
+    .powered-by svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--accent); }
+    .powered-by-text { font-size: 12px; color: var(--left-muted); line-height: 1.4; }
+    .powered-by-text strong { color: var(--left-text); font-weight: 600; }
+
+    /* ─────────────── RIGHT PANEL ─────────────── */
+    .right {
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      background: var(--right-bg);
+    }
+
+    .right-header {
+      text-align: center;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .right-eyebrow {
+      font-size: 11px; font-weight: 700;
+      color: var(--accent); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 8px;
+    }
+    .right-title {
+      font-size: 28px; font-weight: 800;
+      color: var(--right-text); letter-spacing: -0.5px;
+      line-height: 1.2; margin-bottom: 10px;
+    }
+    .right-sub {
+      font-size: 15px; color: var(--right-muted);
+      line-height: 1.6;
+    }
+
+    /* Experience cards */
+    .exp-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .exp-card {
+      background: var(--right-card);
+      border: 1.5px solid var(--right-border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    .exp-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(244,63,94,0.03), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .exp-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 20px rgba(244,63,94,0.12);
+      transform: translateY(-1px);
+    }
+    .exp-card:hover::before { opacity: 1; }
+    .exp-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 4px 20px rgba(244,63,94,0.16);
+      background: #FFF8F9;
+    }
+    .exp-card.active::before { opacity: 1; }
+
+    .exp-icon {
+      width: 48px; height: 48px; min-width: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(244,63,94,0.08);
+      border: 1px solid rgba(244,63,94,0.15);
+    }
+    .exp-icon svg { width: 22px; height: 22px; color: var(--accent); }
+
+    .exp-content { flex: 1; }
+    .exp-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--right-text); margin-bottom: 4px;
+    }
+    .exp-desc {
+      font-size: 13px; color: var(--right-muted);
+      line-height: 1.5;
+    }
+
+    .exp-arrow {
+      width: 32px; height: 32px; min-width: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--right-border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--right-faint);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .exp-card:hover .exp-arrow,
+    .exp-card.active .exp-arrow {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(244,63,94,0.06);
+    }
+    .exp-arrow svg { width: 14px; height: 14px; }
+
+    /* Active indicator dot */
+    .exp-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--accent);
+      background: rgba(244,63,94,0.08);
+      border: 1px solid rgba(244,63,94,0.2);
+      border-radius: 20px;
+      padding: 2px 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .exp-card.active .exp-badge { opacity: 1; }
+
+    /* Status strip */
+    .status-strip {
+      margin-top: 24px;
+      max-width: 480px;
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--right-card);
+      border: 1px solid var(--right-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      color: var(--right-muted);
+    }
+    .status-dot {
+      width: 8px; height: 8px; min-width: 8px;
+      border-radius: 50%;
+      background: var(--right-faint);
+      transition: background 0.3s;
+    }
+    .status-dot.live { background: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.15); }
+    #status-text { font-weight: 500; color: var(--right-text); }
+  </style>
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a href="index.html" class="page-tab">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+      </svg>
+      Concierge Demo
+    </a>
+    <a href="experiences.html" class="page-tab active">
+      <svg viewBox="0 0 14 14" fill="none">
+        <path d="M1 3.5C1 2.67 1.67 2 2.5 2H11.5C12.33 2 13 2.67 13 3.5V9C13 9.83 12.33 10.5 11.5 10.5H8L7 13L6 10.5H2.5C1.67 10.5 1 9.83 1 9V3.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      Web Experiences
+    </a>
+  </nav>
+
+  <div class="layout">
+
+    <!-- LEFT -->
+    <div class="left">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 18 18" fill="none">
+            <path d="M9 2L15.5 5.5V12.5L9 16L2.5 12.5V5.5L9 2Z" fill="white" opacity="0.9"/>
+            <circle cx="9" cy="9" r="2.5" fill="white"/>
+          </svg>
+        </div>
+        <span class="brand-name">Apex</span>
+        <div class="brand-sep"></div>
+        <div class="brand-sub">
+          <div class="cp-dot"></div>
+          Powered by Chili Piper
+        </div>
+      </div>
+
+      <div class="left-copy">
+        <h1>Meet your buyers<br><span>where they are.</span></h1>
+        <p>Chili Piper Chat AI brings intelligent, real-time conversations directly to your website — routing, qualifying, and booking meetings without lifting a finger.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-badge">
+          <div class="stat-num">3<span>×</span></div>
+          <div class="stat-label">higher conversion vs static forms</div>
+        </div>
+        <div class="stat-badge">
+          <div class="stat-num">&lt;<span>2</span>m</div>
+          <div class="stat-label">average time to meeting booked</div>
+        </div>
+      </div>
+
+      <ul class="feature-list">
+        <li>
+          <div class="chk">
+            <svg viewBox="0 0 10 10" fill="none">
+              <path d="M2 5.5L4 7.5L8 3" stroke="#F43F5E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          AI-powered chat that qualifies leads and routes them instantly to the right rep
+        </li>
+        <li>
+          <div class="chk">
+            <svg viewBox="0 0 10 10" fill="none">
+              <path d="M2 5.5L4 7.5L8 3" stroke="#F43F5E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          Announcements that surface timely offers to the right visitors
+        </li>
+        <li>
+          <div class="chk">
+            <svg viewBox="0 0 10 10" fill="none">
+              <path d="M2 5.5L4 7.5L8 3" stroke="#F43F5E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          Inline scheduling so buyers book without leaving your site
+        </li>
+        <li>
+          <div class="chk">
+            <svg viewBox="0 0 10 10" fill="none">
+              <path d="M2 5.5L4 7.5L8 3" stroke="#F43F5E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          No code required — deploy in minutes with a single script tag
+        </li>
+      </ul>
+
+      <div class="powered-by">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor">
+          <path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8S4.41 14.5 8 14.5 14.5 11.59 14.5 8 11.59 1.5 8 1.5Z" stroke-width="1.2"/>
+          <path d="M8 5v3.5l2 2" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <div class="powered-by-text">
+          <strong>Live widget</strong> — the Chili Piper Chat embed is active on this page. Click an experience below to trigger it.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+
+      <div class="right-header">
+        <div class="right-eyebrow">Web Experience Flows</div>
+        <h2 class="right-title">Choose an experience</h2>
+        <p class="right-sub">Click any experience to activate the Chili Piper Chat widget in that mode. The URL updates to reflect the active flow.</p>
+      </div>
+
+      <div class="exp-grid">
+
+        <!-- Chat -->
+        <button class="exp-card" id="btn-chat" onclick="activate('chat')">
+          <div class="exp-badge">Active</div>
+          <div class="exp-icon">
+            <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 4.5C2 3.4 2.9 2.5 4 2.5H18C19.1 2.5 20 3.4 20 4.5V14C20 15.1 19.1 16 18 16H12L11 19.5L10 16H4C2.9 16 2 15.1 2 14V4.5Z"/>
+              <path d="M7 8.5H15M7 11.5H12"/>
+            </svg>
+          </div>
+          <div class="exp-content">
+            <div class="exp-title">Chat AI</div>
+            <div class="exp-desc">Conversational AI that qualifies, routes, and books meetings in real time.</div>
+          </div>
+          <div class="exp-arrow">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7H11M8 4l3 3-3 3"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Announcement -->
+        <button class="exp-card" id="btn-announcement" onclick="activate('announcement')">
+          <div class="exp-badge">Active</div>
+          <div class="exp-icon">
+            <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 11C4 7.13 7.13 4 11 4s7 3.13 7 7-3.13 7-7 7H4V11Z"/>
+              <path d="M11 8v3M11 14h.01"/>
+            </svg>
+          </div>
+          <div class="exp-content">
+            <div class="exp-title">Announcement</div>
+            <div class="exp-desc">Proactively surface targeted messages and offers to the right visitors.</div>
+          </div>
+          <div class="exp-arrow">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7H11M8 4l3 3-3 3"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Scheduling -->
+        <button class="exp-card" id="btn-scheduling" onclick="activate('scheduling')">
+          <div class="exp-badge">Active</div>
+          <div class="exp-icon">
+            <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="16" height="15" rx="2"/>
+              <path d="M3 9h16M8 2v4M14 2v4M7 13h1M10.5 13h1M14 13h1M7 16h1M10.5 16h1M14 16h1"/>
+            </svg>
+          </div>
+          <div class="exp-content">
+            <div class="exp-title">Scheduling</div>
+            <div class="exp-desc">Let buyers book time directly from your site — no back-and-forth.</div>
+          </div>
+          <div class="exp-arrow">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7H11M8 4l3 3-3 3"/>
+            </svg>
+          </div>
+        </button>
+
+      </div>
+
+      <div class="status-strip">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Select an experience to launch the Chili Piper widget</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Chili Piper Chat Config -->
+  <script>
+    window.ChiliChat = {
+      config: {
+        workspaceId: '1338c360-5d38-4d89-8644-985fc0ba8f46',
+        tenantId: 'floating.apps',
+        chatUrl: 'https://chilipiper-com.chilipiper.com/chat/widget/',
+        eventsHandler: (event) => {},
+      },
+    };
+  </script>
+  <script type="module" crossorigin="anonymous" src="https://chilipiper-com.chilipiper.com/chat/embed/assets/index.js"></script>
+
+  <script>
+    const LABELS = {
+      chat: 'Chat AI',
+      announcement: 'Announcement',
+      scheduling: 'Scheduling',
+    };
+
+    function setActive(exp) {
+      ['chat', 'announcement', 'scheduling'].forEach(id => {
+        document.getElementById('btn-' + id).classList.toggle('active', id === exp);
+      });
+      const dot = document.getElementById('status-dot');
+      const txt = document.getElementById('status-text');
+      if (exp) {
+        dot.classList.add('live');
+        txt.textContent = LABELS[exp] + ' experience activated — widget launched';
+      } else {
+        dot.classList.remove('live');
+        txt.textContent = 'Select an experience to launch the Chili Piper widget';
+      }
+    }
+
+    function activate(exp) {
+      window.history.pushState({}, '', '?experience=' + exp);
+      setActive(exp);
+      if (window.ChiliChat && window.ChiliChat.open) {
+        window.ChiliChat.open({ experience: exp });
+      }
+    }
+
+    // On page load, read the URL param
+    (function init() {
+      const params = new URLSearchParams(window.location.search);
+      const exp = params.get('experience');
+      if (exp && LABELS[exp]) {
+        setActive(exp);
+      }
+    })();
+  </script>
+
+</body>
+</html>
