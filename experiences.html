@@ -428,7 +428,7 @@
           <path d="M8 5v3.5l2 2" stroke-width="1.2" stroke-linecap="round"/>
         </svg>
         <div class="powered-by-text">
-          <strong>Live widget</strong> — the Chili Piper Chat embed is active on this page. Click an experience below to trigger it.
+          <strong>On-demand widget</strong> — the Chili Piper Chat embed loads only when you click an experience below.
         </div>
       </div>
     </div>
@@ -514,25 +514,14 @@
     </div>
   </div>
 
-  <!-- Chili Piper Chat Config -->
-  <script>
-    window.ChiliChat = {
-      config: {
-        workspaceId: '1338c360-5d38-4d89-8644-985fc0ba8f46',
-        tenantId: 'floating.apps',
-        chatUrl: 'https://chilipiper-com.chilipiper.com/chat/widget/',
-        eventsHandler: (event) => {},
-      },
-    };
-  </script>
-  <script type="module" crossorigin="anonymous" src="https://chilipiper-com.chilipiper.com/chat/embed/assets/index.js"></script>
-
   <script>
     const LABELS = {
       chat: 'Chat AI',
       announcement: 'Announcement',
       scheduling: 'Scheduling',
     };
+
+    let widgetLoaded = false;
 
     function setActive(exp) {
       ['chat', 'announcement', 'scheduling'].forEach(id => {
@@ -550,21 +539,36 @@
     }
 
     function activate(exp) {
+      // 1. Update URL first
       window.history.pushState({}, '', '?experience=' + exp);
-      setActive(exp);
-      if (window.ChiliChat && window.ChiliChat.open) {
-        window.ChiliChat.open({ experience: exp });
-      }
-    }
 
-    // On page load, read the URL param
-    (function init() {
-      const params = new URLSearchParams(window.location.search);
-      const exp = params.get('experience');
-      if (exp && LABELS[exp]) {
-        setActive(exp);
+      // 2. Update card UI
+      setActive(exp);
+
+      // 3. Launch the widget — inject the script once, then call open on subsequent clicks
+      if (widgetLoaded) {
+        if (window.ChiliChat && window.ChiliChat.open) {
+          window.ChiliChat.open({ experience: exp });
+        }
+        return;
       }
-    })();
+
+      widgetLoaded = true;
+      window.ChiliChat = {
+        config: {
+          workspaceId: '1338c360-5d38-4d89-8644-985fc0ba8f46',
+          tenantId: 'floating.apps',
+          chatUrl: 'https://chilipiper-com.chilipiper.com/chat/widget/',
+          eventsHandler: (event) => {},
+        },
+      };
+
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.crossOrigin = 'anonymous';
+      script.src = 'https://chilipiper-com.chilipiper.com/chat/embed/assets/index.js';
+      document.body.appendChild(script);
+    }
   </script>
 
 </body>
