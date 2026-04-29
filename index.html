@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request a Demo · Apex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --left-bg:      #0C0F1A;
+      --left-card:    #141828;
+      --left-border:  rgba(255,255,255,0.07);
+      --left-text:    #F1F5F9;
+      --left-muted:   #64748B;
+      --left-faint:   #334155;
+      --accent:       #F43F5E;
+      --accent-glow:  rgba(244,63,94,0.15);
+      --green:        #22C55E;
+      --console-bg:   #060912;
+      --console-text: #94A3B8;
+      --console-key:  #7DD3FC;
+      --console-str:  #86EFAC;
+      --console-num:  #FCA5A5;
+      --console-ok:   #4ADE80;
+      --console-url:  #A78BFA;
+      --console-dim:  #334155;
+      --right-bg:     #F8FAFC;
+      --right-card:   #FFFFFF;
+      --right-border: #E2E8F0;
+      --right-text:   #0F172A;
+      --right-muted:  #64748B;
+      --right-faint:  #94A3B8;
+      --input-focus:  #6366F1;
+      --btn-bg:       #0F172A;
+      --slot-sel:     #0F172A;
+      --success:      #16A34A;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      background: var(--right-bg);
+    }
+
+    /* ─────────────── LAYOUT ─────────────── */
+    .layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* ─────────────── LEFT PANEL ─────────────── */
+    .left {
+      width: 42%;
+      min-width: 340px;
+      background: var(--left-bg);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 40px 36px;
+      gap: 32px;
+    }
+
+    /* Brand */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-mark {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-mark svg { width: 18px; height: 18px; }
+    .brand-name {
+      font-size: 17px; font-weight: 700;
+      color: var(--left-text); letter-spacing: -0.3px;
+    }
+    .brand-sep {
+      width: 1px; height: 16px;
+      background: var(--left-border);
+      margin: 0 4px;
+    }
+    .brand-sub {
+      font-size: 11px; font-weight: 500;
+      color: var(--left-muted);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .cp-dot {
+      width: 6px; height: 6px;
+      background: var(--accent); border-radius: 50%;
+    }
+
+    /* Main copy */
+    .left-copy { flex: 0; }
+    .left-copy h1 {
+      font-size: 26px; font-weight: 800;
+      color: var(--left-text); line-height: 1.2;
+      letter-spacing: -0.6px; margin-bottom: 10px;
+    }
+    .left-copy p {
+      font-size: 14px; color: var(--left-muted);
+      line-height: 1.7;
+    }
+
+    /* Benefits */
+    .benefits {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .benefits li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13.5px; color: var(--left-muted); line-height: 1.5;
+    }
+    .chk {
+      width: 18px; height: 18px; min-width: 18px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .chk svg { width: 10px; height: 10px; }
+
+    /* Step tracker */
+    .steps { display: flex; flex-direction: column; }
+    .step-row { display: flex; align-items: flex-start; gap: 14px; }
+    .step-aside { display: flex; flex-direction: column; align-items: center; }
+    .step-circle {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--left-faint);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      color: var(--left-muted);
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .step-circle.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+    .step-circle.done {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+    }
+    .step-line {
+      width: 2px; height: 28px;
+      background: var(--left-faint);
+      margin: 4px 0;
+      transition: background 0.3s;
+    }
+    .step-line.done { background: var(--green); }
+    .step-body { padding-top: 3px; padding-bottom: 28px; }
+    .step-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--left-muted);
+      transition: color 0.3s;
+    }
+    .step-label.active { color: var(--left-text); }
+    .step-desc {
+      font-size: 12px; color: var(--left-muted);
+      margin-top: 3px; line-height: 1.5;
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .step-desc.visible { max-height: 60px; }
+
+    /* API Console */
+    .console {
+      background: var(--console-bg);
+      border: 1px solid var(--left-border);
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .console-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--left-border);
+      background: rgba(255,255,255,0.02);
+    }
+    .c-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .c-dot-r { background: #FF5F57; }
+    .c-dot-y { background: #FEBC2E; }
+    .c-dot-g { background: #28C840; }
+    .console-title {
+      font-size: 11px; font-weight: 500;
+      color: var(--left-muted); margin-left: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .console-body {
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.8;
+      color: var(--console-text);
+      min-height: 140px;
+    }
+    .console-body .c-ok   { color: var(--console-ok); }
+    .console-body .c-key  { color: var(--console-key); }
+    .console-body .c-str  { color: var(--console-str); }
+    .console-body .c-num  { color: var(--console-num); }
+    .console-body .c-url  { color: var(--console-url); }
+    .console-body .c-dim  { color: var(--console-dim); }
+    .console-body .c-err  { color: #F87171; }
+    .console-body .c-acc  { color: var(--accent); }
+
+    /* ─────────────── RIGHT PANEL ─────────────── */
+    .right {
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      background: var(--right-bg);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--right-card);
+      border: 1px solid var(--right-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .card-head {
+      padding: 28px 32px 24px;
+      border-bottom: 1px solid var(--right-border);
+    }
+    .card-eyebrow {
+      font-size: 11px; font-weight: 700;
+      color: var(--accent); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 22px; font-weight: 800;
+      color: var(--right-text); letter-spacing: -0.4px;
+      line-height: 1.2; margin-bottom: 6px;
+    }
+    .card-sub {
+      font-size: 14px; color: var(--right-muted); line-height: 1.6;
+    }
+
+    .card-body { padding: 28px 32px 32px; }
+
+    /* Phase visibility */
+    .phase { display: none; }
+    .phase.active { display: block; }
+
+    /* ─────────────── FORM ─────────────── */
+    .frow {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 14px;
+    }
+    .fgrp { margin-bottom: 14px; }
+    .fgrp:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 11px; font-weight: 600;
+      color: var(--right-muted); text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--right-bg);
+      border: 1px solid var(--right-border);
+      border-radius: 9px;
+      color: var(--right-text);
+      font-family: inherit; font-size: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none; -webkit-appearance: none;
+    }
+    input::placeholder { color: var(--right-faint); }
+    input:focus, select:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+    }
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+    }
+    select option { background: #fff; color: #0F172A; }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px 20px;
+      background: var(--btn-bg); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.18s; margin-top: 20px;
+      letter-spacing: -0.2px;
+    }
+    .btn svg { width: 16px; height: 16px; }
+    .btn:hover:not(:disabled) { background: #1E293B; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15,23,42,0.2); }
+    .btn:active:not(:disabled) { transform: none; box-shadow: none; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    .spinner {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Status messages */
+    .status {
+      display: flex; align-items: flex-start; gap: 9px;
+      padding: 11px 14px; border-radius: 9px;
+      font-size: 13px; margin-top: 14px; line-height: 1.5;
+    }
+    .status svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
+    .status-err  { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); color: #DC2626; }
+    .status-info { background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.18); color: #4338CA; }
+
+    /* ─────────────── SLOTS (Phase 2) ─────────────── */
+    .tz-bar {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--right-muted);
+      margin-bottom: 18px;
+    }
+    .tz-bar svg { width: 13px; height: 13px; }
+    .tz-val { color: var(--right-text); font-weight: 500; }
+
+    .slots-scroll {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 18px;
+      padding-right: 4px;
+    }
+    .slots-scroll::-webkit-scrollbar { width: 4px; }
+    .slots-scroll::-webkit-scrollbar-track { background: transparent; }
+    .slots-scroll::-webkit-scrollbar-thumb { background: var(--right-border); border-radius: 2px; }
+
+    .day-label {
+      font-size: 12px; font-weight: 700;
+      color: var(--right-muted); text-transform: uppercase; letter-spacing: 0.7px;
+      margin-bottom: 8px; margin-top: 16px;
+    }
+    .day-label:first-child { margin-top: 0; }
+
+    .slot-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 4px;
+    }
+    .slot-btn {
+      padding: 8px 14px;
+      border: 1px solid var(--right-border);
+      border-radius: 8px;
+      background: white;
+      color: var(--right-text);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .slot-btn:hover { border-color: #94A3B8; background: var(--right-bg); }
+    .slot-btn.selected {
+      background: var(--slot-sel); border-color: var(--slot-sel);
+      color: white;
+    }
+
+    .no-slots {
+      text-align: center; padding: 32px 0;
+      color: var(--right-muted); font-size: 14px;
+    }
+
+    .confirm-footer {
+      border-top: 1px solid var(--right-border);
+      padding-top: 18px;
+    }
+    .selected-display {
+      font-size: 13px; color: var(--right-muted);
+      margin-bottom: 4px;
+    }
+    .selected-display strong { color: var(--right-text); font-weight: 600; }
+
+    /* ─────────────── CONFIRMATION (Phase 3) ─────────────── */
+    .confirm-icon {
+      width: 56px; height: 56px;
+      background: rgba(22,163,74,0.1);
+      border: 2px solid rgba(22,163,74,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .confirm-icon svg { width: 26px; height: 26px; }
+
+    .meeting-detail {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--right-border);
+      font-size: 14px;
+    }
+    .meeting-detail:last-of-type { border-bottom: none; }
+    .meeting-detail-icon {
+      width: 32px; height: 32px;
+      background: var(--right-bg);
+      border: 1px solid var(--right-border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+    .meeting-detail-body {}
+    .meeting-detail-label { font-size: 11px; font-weight: 600; color: var(--right-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px; }
+    .meeting-detail-val { font-size: 14px; font-weight: 500; color: var(--right-text); }
+
+    .reset-link {
+      background: none; border: none;
+      font-family: inherit; font-size: 13px;
+      color: var(--right-muted); cursor: pointer;
+      text-decoration: underline; margin-top: 16px;
+      display: block; text-align: center;
+    }
+    .reset-link:hover { color: var(--right-text); }
+
+    /* ─────────────── RESPONSIVE ─────────────── */
+    @media (max-width: 860px) {
+      .layout { flex-direction: column; }
+      .left { width: 100%; height: auto; position: static; }
+      .right { padding: 32px 20px; min-height: auto; }
+      .frow { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════════════════════════ LEFT PANEL ═══════════════════════════════ -->
+  <aside class="left">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6V12L9 16L2 12V6L9 2Z" fill="white" fill-opacity="0.9"/></svg>
+      </div>
+      <span class="brand-name">Apex</span>
+      <div class="brand-sep"></div>
+      <span class="brand-sub">
+        <span class="cp-dot"></span>
+        Powered by Chili Piper
+      </span>
+    </div>
+
+    <!-- Copy -->
+    <div class="left-copy">
+      <h1 id="leftHeading">See what a 10× faster sales process looks like</h1>
+      <p id="leftSub" style="margin-top:10px">Submit the form and you'll be connected with the right Apex expert — no waiting, no email chains. Watch how Chili Piper Concierge handles everything in real time.</p>
+    </div>
+
+    <!-- Benefits -->
+    <ul class="benefits" id="leftBenefits">
+      <li>
+        <div class="chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.2 7.5L8 3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Routed to the right rep based on your profile
+      </li>
+      <li>
+        <div class="chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.2 7.5L8 3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Available times returned instantly from the API
+      </li>
+      <li>
+        <div class="chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.2 7.5L8 3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Meeting booked with a single API call — no scheduling tools needed
+      </li>
+    </ul>
+
+    <!-- Step tracker -->
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-aside">
+          <div class="step-circle active" id="s1">1</div>
+          <div class="step-line" id="l1"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-label active" id="sl1">Submit your information</div>
+          <div class="step-desc visible" id="sd1">Your form data is sent to the Concierge routing engine via the <code style="font-family:monospace;font-size:11px;color:#94A3B8">/routers/{slug}/rest</code> endpoint.</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-aside">
+          <div class="step-circle" id="s2">2</div>
+          <div class="step-line" id="l2"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-label" id="sl2">Concierge routes &amp; returns available times</div>
+          <div class="step-desc" id="sd2">Routing rules are evaluated, a rep is assigned, and available time slots are returned in the same API response.</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-aside">
+          <div class="step-circle" id="s3">3</div>
+        </div>
+        <div class="step-body">
+          <div class="step-label" id="sl3">Pick a time — meeting booked</div>
+          <div class="step-desc" id="sd3">Your selected time is sent to <code style="font-family:monospace;font-size:11px;color:#94A3B8">/routing/{id}/schedule-simple</code>. Calendar invite sent instantly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Console -->
+    <div class="console">
+      <div class="console-bar">
+        <div class="c-dot c-dot-r"></div>
+        <div class="c-dot c-dot-y"></div>
+        <div class="c-dot c-dot-g"></div>
+        <span class="console-title">Chili Piper API Console</span>
+      </div>
+      <div class="console-body" id="consoleBody"></div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════════════ RIGHT PANEL ═══════════════════════════════ -->
+  <main class="right">
+    <div class="card">
+
+      <!-- ── PHASE 1 : FORM ── -->
+      <div class="phase active" id="phase1">
+        <div class="card-head">
+          <div class="card-eyebrow">Get Started</div>
+          <div class="card-title">Request a Demo</div>
+          <div class="card-sub">Tell us about yourself and we'll connect you with the right Apex expert — instantly.</div>
+        </div>
+        <div class="card-body">
+          <form id="demoForm" novalidate>
+            <div class="frow">
+              <div class="fgrp">
+                <label for="fn">First Name</label>
+                <input type="text" id="fn" placeholder="Jane" required>
+              </div>
+              <div class="fgrp">
+                <label for="ln">Last Name</label>
+                <input type="text" id="ln" placeholder="Smith" required>
+              </div>
+            </div>
+            <div class="fgrp">
+              <label for="em">Work Email</label>
+              <input type="email" id="em" placeholder="jane@company.com" required>
+            </div>
+            <div class="fgrp">
+              <label for="co">Company</label>
+              <input type="text" id="co" placeholder="Acme Corp">
+            </div>
+            <div class="frow">
+              <div class="fgrp">
+                <label for="sz">Company Size</label>
+                <select id="sz">
+                  <option value="">Select…</option>
+                  <option value="1-10">1–10</option>
+                  <option value="11-50">11–50</option>
+                  <option value="51-200">51–200</option>
+                  <option value="201-500">201–500</option>
+                  <option value="501-1000">501–1,000</option>
+                  <option value="1001+">1,000+</option>
+                </select>
+              </div>
+              <div class="fgrp">
+                <label for="st">State</label>
+                <select id="st">
+                  <option value="">Select…</option>
+                  <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
+                </select>
+              </div>
+            </div>
+            <div id="formStatus"></div>
+            <button type="submit" class="btn" id="submitBtn">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Schedule My Demo
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── PHASE 2 : TIME SLOTS ── -->
+      <div class="phase" id="phase2">
+        <div class="card-head">
+          <div class="card-eyebrow">Routing Complete</div>
+          <div class="card-title">Select a Time</div>
+          <div class="card-sub" id="slotsSubtitle">Choose a time that works for you and we'll send a calendar invite right away.</div>
+        </div>
+        <div class="card-body">
+          <div class="tz-bar">
+            <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M7 3.5V7L9.5 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Times shown in <span class="tz-val" id="tzDisplay"></span>
+          </div>
+          <div class="slots-scroll" id="slotsContainer"></div>
+          <div class="confirm-footer">
+            <div class="selected-display" id="selectedDisplay">No time selected yet</div>
+            <button class="btn" id="confirmBtn" disabled onclick="bookMeeting()">
+              <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2" width="13" height="12" rx="2" stroke="white" stroke-width="1.4"/><path d="M1.5 6H14.5" stroke="white" stroke-width="1.4"/><path d="M5 1V3.5M11 1V3.5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Confirm Meeting
+            </button>
+            <div id="scheduleStatus"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PHASE 3 : CONFIRMATION ── -->
+      <div class="phase" id="phase3">
+        <div class="card-head">
+          <div class="card-eyebrow">Confirmed</div>
+          <div class="card-title">You're Booked!</div>
+          <div class="card-sub">A calendar invite has been sent to your email. We look forward to speaking with you.</div>
+        </div>
+        <div class="card-body">
+          <div class="confirm-icon">
+            <svg viewBox="0 0 26 26" fill="none"><path d="M4 13L10 19L22 7" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div id="confirmDetails"></div>
+          <button class="reset-link" onclick="resetPage()">← Schedule another meeting</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  /* ─────────────── STATE ─────────────── */
+  const S = {
+    routeId:      null,
+    formData:     {},
+    selectedSlot: null,
+    tz:           Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York',
+  };
+
+  /* ─────────────── CONSOLE HELPERS ─────────────── */
+  function con(html) {
+    document.getElementById('consoleBody').innerHTML = html;
+  }
+
+  function consoleIdle() {
+    con(`<span class="c-dim">// Waiting for form submission</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-dim">NEXT</span>  <span class="c-key">POST</span> <span class="c-url">/v1/org/concierge</span>
+      <span class="c-url">  /routers/{routerSlug}/rest</span>`);
+  }
+
+  function consoleLoading() {
+    con(`<span class="c-acc">▶ Sending routing request…</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">POST</span> <span class="c-url">/v1/org/concierge/routers</span>
+     <span class="c-url">/inbound-override-router---marketo</span>
+     <span class="c-url">/rest</span>
+<span class="c-dim">{</span>
+  <span class="c-key">"form"</span><span class="c-dim">:</span>     <span class="c-dim">{ email, firstname, … }</span>
+  <span class="c-key">"interval"</span><span class="c-dim">:</span> <span class="c-dim">{ "duration": "7 days" }</span>
+<span class="c-dim">}</span>`);
+  }
+
+  function consoleRouted(routeId, count) {
+    const short = routeId ? routeId.slice(0, 8) + '…' : '—';
+    con(`<span class="c-ok">✓ 200</span>  <span class="c-key">POST</span> <span class="c-url">/routers/…/rest</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">routeId</span>           <span class="c-str">"${short}"</span>
+<span class="c-key">schedulingAllowed</span> <span class="c-ok">true</span>
+<span class="c-key">startTimes</span>        <span class="c-num">${count}</span> <span class="c-dim">slots available</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-dim">NEXT</span>  <span class="c-key">POST</span> <span class="c-url">/v1/org/concierge/routing</span>
+      <span class="c-url">  /{routingId}/schedule-simple</span>`);
+  }
+
+  function consoleScheduling(routeId) {
+    const short = routeId ? routeId.slice(0, 8) + '…' : '—';
+    con(`<span class="c-acc">▶ Booking meeting…</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">POST</span> <span class="c-url">/v1/org/concierge/routing</span>
+     <span class="c-url">/${short}/schedule-simple</span>
+<span class="c-dim">{</span>
+  <span class="c-key">"startTime"</span><span class="c-dim">:</span> <span class="c-str">"${S.selectedSlot || '…'}"</span>
+<span class="c-dim">}</span>`);
+  }
+
+  function consoleBooked(data) {
+    const id = data?.id || data?.meetingId || data?.routeId || '—';
+    const short = typeof id === 'string' ? id.slice(0, 8) + '…' : id;
+    con(`<span class="c-ok">✓ 200</span>  <span class="c-key">POST</span> <span class="c-url">/routing/…/schedule-simple</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">status</span>  <span class="c-ok">booked</span>
+<span class="c-key">id</span>      <span class="c-str">"${short}"</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-ok">✓ Meeting confirmed &amp; invite sent</span>`);
+  }
+
+  function consoleError(msg) {
+    con(`<span class="c-err">✗ Error</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-err">${msg}</span>`);
+  }
+
+  /* ─────────────── STEP TRACKER ─────────────── */
+  function setStep(n) {
+    [1, 2, 3].forEach(i => {
+      const circle = document.getElementById(`s${i}`);
+      const label  = document.getElementById(`sl${i}`);
+      const desc   = document.getElementById(`sd${i}`);
+      const line   = document.getElementById(`l${i}`);
+
+      circle.classList.remove('active', 'done');
+      label.classList.remove('active');
+      if (desc) desc.classList.remove('visible');
+      if (line) line.classList.remove('done');
+
+      if (i < n) {
+        circle.classList.add('done');
+        circle.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        if (line) line.classList.add('done');
+      } else if (i === n) {
+        circle.classList.add('active');
+        circle.textContent = i;
+        label.classList.add('active');
+        if (desc) desc.classList.add('visible');
+      } else {
+        circle.textContent = i;
+      }
+    });
+  }
+
+  /* ─────────────── PHASE SWITCHING ─────────────── */
+  function showPhase(n) {
+    document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+    document.getElementById(`phase${n}`).classList.add('active');
+    setStep(n);
+  }
+
+  /* ─────────────── TIME HELPERS ─────────────── */
+  function normalizeISO(slot) {
+    if (typeof slot === 'string') return slot;
+    return slot?.start || slot?.startTime || null;
+  }
+
+  function fmtTime(iso, tz) {
+    return new Date(iso).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', timeZone: tz
+    });
+  }
+
+  function fmtDate(iso, tz) {
+    return new Date(iso).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric', timeZone: tz
+    });
+  }
+
+  function fmtFull(iso, tz) {
+    return new Date(iso).toLocaleString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', timeZone: tz
+    });
+  }
+
+  /* ─────────────── RENDER SLOTS ─────────────── */
+  function renderSlots(startTimes) {
+    const container = document.getElementById('slotsContainer');
+
+    if (!startTimes || startTimes.length === 0) {
+      container.innerHTML = `<div class="no-slots">No available times returned.<br>Please try again or contact us directly.</div>`;
+      return;
+    }
+
+    // Group by day
+    const groups = new Map();
+    startTimes.forEach(slot => {
+      const iso = normalizeISO(slot);
+      if (!iso) return;
+      const day = fmtDate(iso, S.tz);
+      if (!groups.has(day)) groups.set(day, []);
+      groups.get(day).push(iso);
+    });
+
+    let html = '';
+    groups.forEach((isos, day) => {
+      html += `<div class="day-label">${day}</div><div class="slot-grid">`;
+      isos.forEach(iso => {
+        html += `<button class="slot-btn" data-iso="${iso}" onclick="selectSlot('${iso}', this)">${fmtTime(iso, S.tz)}</button>`;
+      });
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  /* ─────────────── SELECT A SLOT ─────────────── */
+  function selectSlot(iso, el) {
+    document.querySelectorAll('.slot-btn.selected').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    S.selectedSlot = iso;
+
+    document.getElementById('confirmBtn').disabled = false;
+    document.getElementById('selectedDisplay').innerHTML =
+      `Selected: <strong>${fmtFull(iso, S.tz)}</strong>`;
+  }
+
+  /* ─────────────── FORM SUBMIT → ROUTE ─────────────── */
+  document.getElementById('demoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fn = document.getElementById('fn').value.trim();
+    const ln = document.getElementById('ln').value.trim();
+    const em = document.getElementById('em').value.trim();
+    const sz = document.getElementById('sz').value;
+    const st = document.getElementById('st').value;
+    const statusEl = document.getElementById('formStatus');
+    const btn = document.getElementById('submitBtn');
+
+    if (!fn || !ln || !em) {
+      statusEl.innerHTML = `<div class="status status-err">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Please enter your first name, last name, and work email.
+      </div>`;
+      return;
+    }
+
+    S.formData = { firstname: fn, lastname: ln, email: em };
+
+    const origBtn = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Routing your request…';
+    btn.disabled = true;
+    statusEl.innerHTML = '';
+    consoleLoading();
+
+    const now = new Date();
+    const payload = {
+      form: {
+        email:        em,
+        firstname:    fn,
+        lastname:     ln,
+        EmployeeSize: sz,
+        State:        st,
+      },
+      options: {
+        timezone: S.tz,
+        trigger:  'ThirdPartyForm',
+      },
+      interval: {
+        startsAt: now.toISOString(),
+        duration: '7 days',
+      },
+    };
+
+    try {
+      const res  = await fetch('/api/concierge-route', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+      }
+
+      S.routeId = data.routeId;
+
+      const startTimes =
+        data?.schedulingData?.startTimes ||
+        data?.startTimes ||
+        [];
+
+      const count = startTimes.length;
+      consoleRouted(S.routeId, count);
+
+      // Populate slots view
+      document.getElementById('tzDisplay').textContent = S.tz;
+      document.getElementById('slotsSubtitle').textContent =
+        `${count} time${count !== 1 ? 's' : ''} available with your assigned rep. Select one below.`;
+      renderSlots(startTimes);
+
+      showPhase(2);
+
+    } catch (err) {
+      btn.innerHTML = origBtn;
+      btn.disabled = false;
+      consoleError(err.message);
+      statusEl.innerHTML = `<div class="status status-err">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        ${err.message}
+      </div>`;
+    }
+  });
+
+  /* ─────────────── CONFIRM SLOT → SCHEDULE ─────────────── */
+  async function bookMeeting() {
+    if (!S.selectedSlot || !S.routeId) return;
+
+    const btn = document.getElementById('confirmBtn');
+    const statusEl = document.getElementById('scheduleStatus');
+    const origBtn = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Booking…';
+    btn.disabled = true;
+    statusEl.innerHTML = '';
+    consoleScheduling(S.routeId);
+
+    const payload = {
+      routingId: S.routeId,
+      startTime: S.selectedSlot,
+      timezone:  S.tz,
+      lead: {
+        email:     S.formData.email,
+        firstName: S.formData.firstname,
+        lastName:  S.formData.lastname,
+      },
+    };
+
+    try {
+      const res  = await fetch('/api/concierge-schedule', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+      }
+
+      consoleBooked(data);
+      renderConfirmation(data);
+      showPhase(3);
+
+    } catch (err) {
+      btn.innerHTML = origBtn;
+      btn.disabled = false;
+      consoleError(err.message);
+      statusEl.innerHTML = `<div class="status status-err">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        ${err.message}
+      </div>`;
+    }
+  }
+
+  /* ─────────────── RENDER CONFIRMATION ─────────────── */
+  function renderConfirmation(data) {
+    const slot = S.selectedSlot;
+    const tz   = S.tz;
+
+    const dateStr = new Date(slot).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric', timeZone: tz
+    });
+    const timeStr = new Date(slot).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', timeZone: tz
+    });
+
+    document.getElementById('confirmDetails').innerHTML = `
+      <div class="meeting-detail">
+        <div class="meeting-detail-icon">📅</div>
+        <div class="meeting-detail-body">
+          <div class="meeting-detail-label">Date</div>
+          <div class="meeting-detail-val">${dateStr}</div>
+        </div>
+      </div>
+      <div class="meeting-detail">
+        <div class="meeting-detail-icon">⏰</div>
+        <div class="meeting-detail-body">
+          <div class="meeting-detail-label">Time</div>
+          <div class="meeting-detail-val">${timeStr} · ${tz}</div>
+        </div>
+      </div>
+      <div class="meeting-detail">
+        <div class="meeting-detail-icon">📧</div>
+        <div class="meeting-detail-body">
+          <div class="meeting-detail-label">Invite sent to</div>
+          <div class="meeting-detail-val">${S.formData.email}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ─────────────── RESET ─────────────── */
+  function resetPage() {
+    S.routeId = null;
+    S.formData = {};
+    S.selectedSlot = null;
+
+    document.getElementById('demoForm').reset();
+    document.getElementById('formStatus').innerHTML = '';
+    document.getElementById('scheduleStatus').innerHTML = '';
+    document.getElementById('selectedDisplay').textContent = 'No time selected yet';
+    document.getElementById('confirmBtn').disabled = true;
+    document.getElementById('slotsContainer').innerHTML = '';
+
+    showPhase(1);
+    consoleIdle();
+  }
+
+  /* ─────────────── INIT ─────────────── */
+  consoleIdle();
+  setStep(1);
+</script>
+</body>
+</html>
