@@ -846,18 +846,14 @@
     consoleLoading();
 
     const now = new Date();
+    // Build form object — omit blank optional fields so the API doesn't reject them
+    const form = { email: em, firstname: fn, lastname: ln };
+    if (sz) form.EmployeeSize = sz;
+    if (st) form.State = st;
+
     const payload = {
-      form: {
-        email:        em,
-        firstname:    fn,
-        lastname:     ln,
-        EmployeeSize: sz,
-        State:        st,
-      },
-      options: {
-        timezone: S.tz,
-        trigger:  'ThirdPartyForm',
-      },
+      form,
+      options: { timezone: S.tz },
       interval: {
         startsAt: now.toISOString(),
         duration: '7 days',
@@ -873,7 +869,9 @@
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+        // Surface the raw API error so it's visible in the console and on screen
+        const msg = data?.message || data?.error || data?.errors?.[0]?.message || JSON.stringify(data);
+        throw new Error(msg);
       }
 
       S.routeId = data.routeId;
@@ -937,7 +935,8 @@
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+        const msg = data?.message || data?.error || data?.errors?.[0]?.message || JSON.stringify(data);
+        throw new Error(msg);
       }
 
       consoleBooked(data);
