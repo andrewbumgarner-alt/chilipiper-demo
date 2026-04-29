@@ -441,6 +441,57 @@
     }
     .reset-link:hover { color: var(--right-text); }
 
+    /* ─────────────── MODE TOGGLE ─────────────── */
+    .toggle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .toggle-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--right-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .toggle {
+      display: inline-flex;
+      background: #F1F5F9;
+      border: 1px solid var(--right-border);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 3px;
+    }
+    .toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 20px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--right-muted);
+      background: transparent;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .toggle-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .toggle-btn.active {
+      background: var(--right-card);
+      color: var(--right-text);
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .toggle-hint {
+      font-size: 12px;
+      color: var(--right-faint);
+    }
+
     /* ─────────────── RESPONSIVE ─────────────── */
     @media (max-width: 860px) {
       .layout { flex-direction: column; }
@@ -539,6 +590,23 @@
 
   <!-- ═══════════════════════════════ RIGHT PANEL ═══════════════════════════════ -->
   <main class="right">
+
+    <!-- Mode toggle -->
+    <div class="toggle-wrap">
+      <span class="toggle-label">Integration Method</span>
+      <div class="toggle">
+        <button class="toggle-btn active" id="btnEdge" onclick="setMode('edge')">
+          <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 7h6M7 4v6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Edge API
+        </button>
+        <button class="toggle-btn" id="btnJsapi" onclick="setMode('jsapi')">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M2 10.5L5.5 7L2 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          JS API
+        </button>
+      </div>
+      <span class="toggle-hint" id="toggleHint">Using Edge API endpoints via serverless functions</span>
+    </div>
+
     <div class="card">
 
       <!-- ── PHASE 1 : FORM ── -->
@@ -817,6 +885,70 @@
       `Selected: <strong>${fmtFull(iso, S.tz)}</strong>`;
   }
 
+  /* ─────────────── MODE MANAGEMENT ─────────────── */
+  let mode = 'edge';
+  let cpDeployed = false;
+
+  function setMode(newMode) {
+    if (mode === newMode) return;
+    mode = newMode;
+
+    document.getElementById('btnEdge').classList.toggle('active', newMode === 'edge');
+    document.getElementById('btnJsapi').classList.toggle('active', newMode === 'jsapi');
+    document.getElementById('toggleHint').textContent = newMode === 'edge'
+      ? 'Using Edge API endpoints via serverless functions'
+      : 'Using ChiliPiper.deploy() — JS SDK handles routing & scheduling';
+
+    resetPage();
+
+    if (newMode === 'jsapi') {
+      // Update left panel
+      document.getElementById('leftHeading').textContent = 'Concierge via the ChiliPiper JS SDK';
+      document.getElementById('leftSub').textContent =
+        'ChiliPiper.deploy() intercepts your HTML form submission client-side, evaluates routing rules, and surfaces available times in a native popup — no backend calls needed from your code.';
+      document.getElementById('sd1').innerHTML =
+        '<code style="font-family:monospace;font-size:11px;color:#94A3B8">ChiliPiper.deploy()</code> attaches to the HTML form. On submit, the JS SDK reads field values and triggers the Concierge flow.';
+      document.getElementById('sd2').textContent =
+        'The SDK calls the Chili Piper routing engine and presents available times in a native scheduling popup.';
+      document.getElementById('sd3').textContent =
+        'The prospect picks a time inside the popup. The SDK books the meeting — no extra code required.';
+      consoleJsApi();
+
+      // Activate ChiliPiper deploy once
+      if (!cpDeployed && typeof ChiliPiper !== 'undefined') {
+        ChiliPiper.deploy('chilipiper-com', 'inbound-override-router---marketo', {
+          formType: 'HTML',
+        });
+        cpDeployed = true;
+      }
+    } else {
+      // Restore Edge API left panel
+      document.getElementById('leftHeading').textContent = 'See what a 10× faster sales process looks like';
+      document.getElementById('leftSub').textContent =
+        'Submit the form and you\'ll be connected with the right Apex expert — no waiting, no email chains. Watch how Chili Piper Concierge handles everything in real time.';
+      document.getElementById('sd1').innerHTML =
+        'Your form data is sent to the Concierge routing engine via the <code style="font-family:monospace;font-size:11px;color:#94A3B8">/routers/{slug}/rest</code> endpoint.';
+      document.getElementById('sd2').textContent =
+        'Routing rules are evaluated, a rep is assigned, and available time slots are returned in the same API response.';
+      document.getElementById('sd3').innerHTML =
+        'Your selected time is sent to <code style="font-family:monospace;font-size:11px;color:#94A3B8">/routing/{id}/schedule-simple</code>. Calendar invite sent instantly.';
+      consoleIdle();
+    }
+  }
+
+  function consoleJsApi() {
+    con(`<span class="c-dim">// ChiliPiper JS SDK — deploy mode</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">ChiliPiper</span><span class="c-dim">.</span><span class="c-url">deploy</span><span class="c-dim">(</span>
+  <span class="c-str">"chilipiper-com"</span><span class="c-dim">,</span>
+  <span class="c-str">"inbound-override-router---marketo"</span><span class="c-dim">,</span>
+  <span class="c-dim">{ </span><span class="c-key">formType</span><span class="c-dim">: </span><span class="c-str">"HTML"</span><span class="c-dim"> }</span>
+<span class="c-dim">)</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-dim">// Submit the form to launch the</span>
+<span class="c-dim">// native Concierge popup</span>`);
+  }
+
   /* ─────────────── FORM SUBMIT → ROUTE ─────────────── */
   document.getElementById('demoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -834,6 +966,17 @@
         <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         Please enter your first name, last name, and work email.
       </div>`;
+      return;
+    }
+
+    // JS API mode — ChiliPiper.deploy() handles routing & scheduling natively
+    if (mode === 'jsapi') {
+      con(`<span class="c-ok">▶ Concierge popup launching…</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">ChiliPiper</span><span class="c-dim">.</span><span class="c-url">deploy</span><span class="c-dim">()</span>
+<span class="c-dim">intercepting form · running routing</span>
+<span class="c-dim">rules · surfacing available times</span>`);
+      // ChiliPiper's listener (attached via deploy) fires after ours and handles everything
       return;
     }
 
@@ -1012,5 +1155,8 @@
   consoleIdle();
   setStep(1);
 </script>
+
+<!-- ChiliPiper JS SDK (loaded for JS API mode) -->
+<script id="chilipiper-concierge" src="https://chilipiper-com.chilipiper.com/concierge-js/cjs/concierge.js" crossorigin="anonymous" type="text/javascript"></script>
 </body>
 </html>
