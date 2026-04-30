@@ -263,6 +263,15 @@
 
     .card-body { padding: 28px 32px 32px; }
 
+    /* Inline ChiliPiper embed container */
+    #cp-inline-slot {
+      display: none;
+      min-height: 520px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
     /* Phase visibility */
     .phase { display: none; }
     .phase.active { display: block; }
@@ -640,9 +649,9 @@
       <!-- ── PHASE 1 : FORM ── -->
       <div class="phase active" id="phase1">
         <div class="card-head">
-          <div class="card-eyebrow">Get Started</div>
-          <div class="card-title">Request a Demo</div>
-          <div class="card-sub">Tell us about yourself and we'll connect you with the right Apex expert — instantly.</div>
+          <div class="card-eyebrow" id="cardEyebrow">Get Started</div>
+          <div class="card-title" id="cardTitle">Request a Demo</div>
+          <div class="card-sub" id="cardSub">Tell us about yourself and we'll connect you with the right Apex expert — instantly.</div>
         </div>
         <div class="card-body">
 
@@ -667,20 +676,20 @@
             <div class="frow">
               <div class="fgrp">
                 <label for="fn">First Name</label>
-                <input type="text" id="fn" placeholder="Jane" required>
+                <input type="text" id="fn" name="firstName" placeholder="Jane" required>
               </div>
               <div class="fgrp">
                 <label for="ln">Last Name</label>
-                <input type="text" id="ln" placeholder="Smith" required>
+                <input type="text" id="ln" name="lastName" placeholder="Smith" required>
               </div>
             </div>
             <div class="fgrp">
               <label for="em">Work Email</label>
-              <input type="email" id="em" placeholder="jane@company.com" required>
+              <input type="email" id="em" name="email" placeholder="jane@company.com" required>
             </div>
             <div class="fgrp">
               <label for="co">Company</label>
-              <input type="text" id="co" placeholder="Acme Corp">
+              <input type="text" id="co" name="company" placeholder="Acme Corp">
             </div>
             <div class="frow">
               <div class="fgrp">
@@ -964,6 +973,12 @@
       if (!cpDeployed && typeof ChiliPiper !== 'undefined') {
         ChiliPiper.deploy('chilipiper-com', 'inbound-override-router---marketo', {
           formType: 'HTML',
+          map: [
+            { inboundFieldName: 'email',     formFieldId: 'em' },
+            { inboundFieldName: 'firstName',  formFieldId: 'fn' },
+            { inboundFieldName: 'lastName',   formFieldId: 'ln' },
+            { inboundFieldName: 'company',    formFieldId: 'co' },
+          ],
         });
         cpDeployed = true;
       }
