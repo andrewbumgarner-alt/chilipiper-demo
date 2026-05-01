@@ -263,6 +263,13 @@
 
     .card-body { padding: 28px 32px 32px; }
 
+    #cp-inline-slot {
+      display: none;
+      min-height: 520px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
     /* Inline ChiliPiper embed container */
     #cp-inline-slot {
       display: none;
@@ -718,6 +725,8 @@
               Schedule My Demo
             </button>
           </form>
+
+          <div id="cp-inline-slot"></div>
         </div>
       </div>
 
@@ -973,6 +982,7 @@
       if (!cpDeployed && typeof ChiliPiper !== 'undefined') {
         ChiliPiper.deploy('chilipiper-com', 'inbound-override-router---marketo', {
           formType: 'HTML',
+          domElement: '#cp-inline-slot',
           map: [
             { inboundFieldName: 'email',     formFieldId: 'em' },
             { inboundFieldName: 'firstName',  formFieldId: 'fn' },
@@ -1032,12 +1042,21 @@
 
     // JS API mode — ChiliPiper.deploy() handles routing & scheduling natively
     if (mode === 'jsapi') {
-      con(`<span class="c-ok">▶ Concierge popup launching…</span>
+      con(`<span class="c-ok">▶ Concierge routing…</span>
 <span class="c-dim">──────────────────────────────────</span>
 <span class="c-key">ChiliPiper</span><span class="c-dim">.</span><span class="c-url">deploy</span><span class="c-dim">()</span>
 <span class="c-dim">intercepting form · running routing</span>
-<span class="c-dim">rules · surfacing available times</span>`);
-      // ChiliPiper's listener (attached via deploy) fires after ours and handles everything
+<span class="c-dim">rules · rendering calendar inline</span>`);
+      // Swap card-head
+      document.getElementById('cardEyebrow').textContent = 'Concierge';
+      document.getElementById('cardTitle').textContent = 'Select a Time';
+      document.getElementById('cardSub').textContent = 'Routed by Chili Piper — pick a time below to confirm your meeting.';
+      // Hide form controls, reveal inline calendar target
+      document.querySelector('.toggle-wrap').style.display = 'none';
+      document.querySelector('.toggle-divider').style.display = 'none';
+      document.getElementById('demoForm').style.display = 'none';
+      document.getElementById('cp-inline-slot').style.display = 'block';
+      // ChiliPiper's listener (attached via deploy) fires after ours and renders into #cp-inline-slot
       return;
     }
 
@@ -1207,6 +1226,16 @@
     document.getElementById('selectedDisplay').textContent = 'No time selected yet';
     document.getElementById('confirmBtn').disabled = true;
     document.getElementById('slotsContainer').innerHTML = '';
+
+    // Restore JS API inline state
+    document.getElementById('cardEyebrow').textContent = 'Get Started';
+    document.getElementById('cardTitle').textContent = 'Request a Demo';
+    document.getElementById('cardSub').textContent = 'Tell us about yourself and we\'ll connect you with the right Apex expert — instantly.';
+    document.querySelector('.toggle-wrap').style.display = '';
+    document.querySelector('.toggle-divider').style.display = '';
+    document.getElementById('demoForm').style.display = '';
+    document.getElementById('cp-inline-slot').style.display = 'none';
+    document.getElementById('cp-inline-slot').innerHTML = '';
 
     showPhase(1);
     consoleIdle();
