@@ -521,8 +521,6 @@
       scheduling: 'Scheduling',
     };
 
-    let widgetLoaded = false;
-
     function setActive(exp) {
       ['chat', 'announcement', 'scheduling'].forEach(id => {
         document.getElementById('btn-' + id).classList.toggle('active', id === exp);
@@ -538,6 +536,21 @@
       }
     }
 
+    function destroyWidget() {
+      // Call the SDK's own destroy if available
+      if (window.ChiliChat && typeof window.ChiliChat.destroy === 'function') {
+        window.ChiliChat.destroy();
+      }
+      // Remove any DOM the widget injected
+      document.querySelectorAll('[id^="chili"], [class^="chili"], [id^="cp-chat"], [class^="cp-chat"]')
+        .forEach(el => el.remove());
+      // Remove the previous script tag
+      const old = document.getElementById('chilichat-script');
+      if (old) old.remove();
+      // Clear the global so the fresh config is picked up
+      delete window.ChiliChat;
+    }
+
     function activate(exp) {
       // 1. Update URL first
       window.history.pushState({}, '', '?experience=' + exp);
@@ -545,15 +558,10 @@
       // 2. Update card UI
       setActive(exp);
 
-      // 3. Launch the widget — inject the script once, then call open on subsequent clicks
-      if (widgetLoaded) {
-        if (window.ChiliChat && window.ChiliChat.open) {
-          window.ChiliChat.open({ experience: exp });
-        }
-        return;
-      }
+      // 3. Tear down any existing session so each click starts fresh
+      destroyWidget();
 
-      widgetLoaded = true;
+      // 4. Set fresh config before the module loads
       window.ChiliChat = {
         config: {
           workspaceId: '1338c360-5d38-4d89-8644-985fc0ba8f46',
@@ -563,10 +571,13 @@
         },
       };
 
+      // 5. Inject script with a timestamp so the browser treats it as a new module
+      //    and re-executes it rather than serving the cached instance
       const script = document.createElement('script');
+      script.id = 'chilichat-script';
       script.type = 'module';
       script.crossOrigin = 'anonymous';
-      script.src = 'https://chilipiper-com.chilipiper.com/chat/embed/assets/index.js';
+      script.src = `https://chilipiper-com.chilipiper.com/chat/embed/assets/index.js?t=${Date.now()}`;
       document.body.appendChild(script);
     }
   </script>
