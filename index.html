@@ -265,9 +265,23 @@
 
     #cp-inline-slot {
       display: none;
-      min-height: 520px;
-      border-radius: 8px;
+      /* Pull out of card-body padding so iframe fills edge-to-edge */
+      margin: 0 -32px -32px -32px;
+      height: calc(100vh - 240px);
+      min-height: 580px;
+      border-radius: 0 0 18px 18px;
       overflow: hidden;
+    }
+
+    /* Card grows wider when hosting the inline scheduler */
+    .card.cp-embed-active {
+      max-width: 640px;
+    }
+
+    /* Right panel aligns to top so tall card isn't clipped */
+    .right.cp-embed-active {
+      align-items: flex-start;
+      padding-top: 32px;
     }
 
     /* Inline ChiliPiper embed container */
@@ -1056,6 +1070,8 @@
       document.querySelector('.toggle-divider').style.display = 'none';
       document.getElementById('demoForm').style.display = 'none';
       document.getElementById('cp-inline-slot').style.display = 'block';
+      document.querySelector('.card').classList.add('cp-embed-active');
+      document.querySelector('.right').classList.add('cp-embed-active');
       // ChiliPiper's listener (attached via deploy) fires after ours and renders into #cp-inline-slot
       return;
     }
@@ -1236,6 +1252,8 @@
     document.getElementById('demoForm').style.display = '';
     document.getElementById('cp-inline-slot').style.display = 'none';
     document.getElementById('cp-inline-slot').innerHTML = '';
+    document.querySelector('.card').classList.remove('cp-embed-active');
+    document.querySelector('.right').classList.remove('cp-embed-active');
 
     showPhase(1);
     consoleIdle();
