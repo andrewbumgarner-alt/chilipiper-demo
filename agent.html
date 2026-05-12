@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Booking Agent · Apex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --left-bg:      #0C0F1A;
+      --left-card:    #141828;
+      --left-border:  rgba(255,255,255,0.07);
+      --left-text:    #F1F5F9;
+      --left-muted:   #64748B;
+      --left-faint:   #334155;
+      --accent:       #F43F5E;
+      --accent-glow:  rgba(244,63,94,0.15);
+      --green:        #22C55E;
+      --console-bg:   #060912;
+      --console-text: #94A3B8;
+      --console-key:  #7DD3FC;
+      --console-str:  #86EFAC;
+      --console-num:  #FCA5A5;
+      --console-ok:   #4ADE80;
+      --console-url:  #A78BFA;
+      --console-dim:  #334155;
+      --right-bg:     #F8FAFC;
+      --right-card:   #FFFFFF;
+      --right-border: #E2E8F0;
+      --right-text:   #0F172A;
+      --right-muted:  #64748B;
+      --right-faint:  #94A3B8;
+      --slot-sel:     #0F172A;
+    }
+
+    html, body { height: 100%; }
+    body {
+      padding-top: 44px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      background: var(--right-bg);
+    }
+
+    /* ─────────────── PAGE NAV ─────────────── */
+    .page-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      height: 44px;
+      background: #05050C;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 2px;
+    }
+    .page-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 13px; font-weight: 500;
+      color: var(--left-muted);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .page-tab svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .page-tab:hover  { color: var(--left-text); background: rgba(255,255,255,0.05); }
+    .page-tab.active { color: var(--left-text); background: rgba(255,255,255,0.08); }
+
+    /* ─────────────── LAYOUT ─────────────── */
+    .layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* ─────────────── LEFT PANEL ─────────────── */
+    .left {
+      width: 42%;
+      min-width: 340px;
+      background: var(--left-bg);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 44px;
+      height: calc(100vh - 44px);
+      overflow-y: auto;
+      padding: 40px 36px;
+      gap: 32px;
+    }
+
+    /* Brand */
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-mark svg { width: 18px; height: 18px; }
+    .brand-name { font-size: 17px; font-weight: 700; color: var(--left-text); letter-spacing: -0.3px; }
+    .brand-sep  { width: 1px; height: 16px; background: var(--left-border); margin: 0 4px; }
+    .brand-sub  {
+      font-size: 11px; font-weight: 500;
+      color: var(--left-muted);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .cp-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+    /* Main copy */
+    .left-copy h1 {
+      font-size: 26px; font-weight: 800;
+      color: var(--left-text); line-height: 1.2;
+      letter-spacing: -0.6px; margin-bottom: 10px;
+    }
+    .left-copy p { font-size: 14px; color: var(--left-muted); line-height: 1.7; }
+
+    /* Benefits */
+    .benefits { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .benefits li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13.5px; color: var(--left-muted); line-height: 1.5;
+    }
+    .chk {
+      width: 18px; height: 18px; min-width: 18px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .chk svg { width: 10px; height: 10px; }
+
+    /* Step tracker */
+    .steps { display: flex; flex-direction: column; }
+    .step-row  { display: flex; align-items: flex-start; gap: 14px; }
+    .step-aside { display: flex; flex-direction: column; align-items: center; }
+    .step-circle {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--left-faint);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      color: var(--left-muted);
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .step-circle.active { border-color: var(--accent); background: var(--accent); color: white; }
+    .step-circle.done   { border-color: var(--green);  background: var(--green);  color: white; }
+    .step-line {
+      width: 2px; height: 28px;
+      background: var(--left-faint);
+      margin: 4px 0;
+      transition: background 0.3s;
+    }
+    .step-line.done { background: var(--green); }
+    .step-body    { padding-top: 3px; padding-bottom: 28px; }
+    .step-label   { font-size: 13px; font-weight: 600; color: var(--left-muted); transition: color 0.3s; }
+    .step-label.active { color: var(--left-text); }
+    .step-desc {
+      font-size: 12px; color: var(--left-muted);
+      margin-top: 3px; line-height: 1.5;
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .step-desc.visible { max-height: 60px; }
+
+    /* API Console */
+    .console {
+      background: var(--console-bg);
+      border: 1px solid var(--left-border);
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .console-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--left-border);
+      background: rgba(255,255,255,0.02);
+    }
+    .c-dot  { width: 9px; height: 9px; border-radius: 50%; }
+    .c-dot-r { background: #FF5F57; }
+    .c-dot-y { background: #FEBC2E; }
+    .c-dot-g { background: #28C840; }
+    .console-title {
+      font-size: 11px; font-weight: 500;
+      color: var(--left-muted); margin-left: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .console-body {
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.8;
+      color: var(--console-text);
+      min-height: 140px;
+    }
+    .console-body .c-ok  { color: var(--console-ok); }
+    .console-body .c-key { color: var(--console-key); }
+    .console-body .c-str { color: var(--console-str); }
+    .console-body .c-num { color: var(--console-num); }
+    .console-body .c-url { color: var(--console-url); }
+    .console-body .c-dim { color: var(--console-dim); }
+    .console-body .c-err { color: #F87171; }
+    .console-body .c-acc { color: var(--accent); }
+
+    /* ─────────────── RIGHT PANEL ─────────────── */
+    .right {
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 40px 32px;
+      background: var(--right-bg);
+    }
+
+    /* ─────────────── CHAT CARD ─────────────── */
+    .chat-card {
+      width: 100%;
+      max-width: 520px;
+      height: calc(100vh - 108px);
+      min-height: 520px;
+      background: var(--right-card);
+      border: 1px solid var(--right-border);
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Chat header */
+    .chat-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--right-border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .agent-avatar {
+      width: 40px; height: 40px; min-width: 40px;
+      background: linear-gradient(135deg, var(--accent), #7C3AED);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .agent-avatar svg { width: 20px; height: 20px; color: white; }
+    .agent-info { flex: 1; }
+    .agent-name  { font-size: 15px; font-weight: 700; color: var(--right-text); }
+    .agent-status {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 2px;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+    }
+    .agent-status span { font-size: 12px; color: var(--right-muted); }
+    .new-chat-btn {
+      padding: 7px 14px;
+      background: var(--right-bg);
+      border: 1px solid var(--right-border);
+      border-radius: 8px;
+      font-family: inherit; font-size: 12px; font-weight: 500;
+      color: var(--right-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .new-chat-btn:hover { color: var(--right-text); border-color: #94A3B8; }
+
+    /* Messages area */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--right-border); border-radius: 2px; }
+
+    /* Message rows */
+    .msg-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .msg-wrap.msg-user {
+      flex-direction: row-reverse;
+    }
+
+    /* Avatars */
+    .msg-avatar {
+      width: 28px; height: 28px; min-width: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #7C3AED);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+    .msg-avatar svg { width: 14px; height: 14px; color: white; }
+
+    /* Bubbles */
+    .msg-bubble {
+      max-width: 78%;
+      padding: 11px 15px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .msg-wrap.msg-agent .msg-bubble {
+      background: var(--right-bg);
+      border: 1px solid var(--right-border);
+      color: var(--right-text);
+      border-bottom-left-radius: 4px;
+    }
+    .msg-wrap.msg-user .msg-bubble {
+      background: #0F172A;
+      color: #F1F5F9;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* Typing indicator */
+    .typing-bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 14px 16px;
+    }
+    .typing-bubble span {
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: var(--right-faint);
+      border-radius: 50%;
+      animation: typingBounce 1.3s ease-in-out infinite;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.18s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30%            { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Slot message */
+    .msg-slots {
+      max-width: 90% !important;
+      padding: 14px 16px !important;
+    }
+    .slot-intro {
+      font-size: 13.5px;
+      color: var(--right-muted);
+      margin-bottom: 12px;
+    }
+    .slot-day-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--right-muted);
+      text-transform: uppercase; letter-spacing: 0.7px;
+      margin-bottom: 7px; margin-top: 14px;
+    }
+    .slot-day-label:first-of-type { margin-top: 0; }
+    .slot-row {
+      display: flex; flex-wrap: wrap; gap: 7px;
+      margin-bottom: 4px;
+    }
+    .chat-slot-btn {
+      padding: 7px 13px;
+      border: 1px solid var(--right-border);
+      border-radius: 8px;
+      background: white;
+      color: var(--right-text);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .chat-slot-btn:hover:not(:disabled) {
+      border-color: #94A3B8;
+      background: var(--right-bg);
+    }
+    .chat-slot-btn.selected {
+      background: var(--slot-sel);
+      border-color: var(--slot-sel);
+      color: white;
+    }
+    .chat-slot-btn:disabled:not(.selected) { opacity: 0.4; cursor: default; }
+
+    /* Confirmation bubble */
+    .msg-confirm {
+      max-width: 88% !important;
+      padding: 0 !important;
+      overflow: hidden;
+    }
+    .confirm-head {
+      padding: 16px 18px 12px;
+    }
+    .confirm-check {
+      width: 44px; height: 44px;
+      background: rgba(22,163,74,0.1);
+      border: 2px solid rgba(22,163,74,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .confirm-check svg { width: 22px; height: 22px; }
+    .confirm-title { font-size: 15px; font-weight: 700; color: var(--right-text); }
+    .confirm-note  { font-size: 12.5px; color: var(--right-muted); margin-top: 2px; }
+    .confirm-rows  {
+      border-top: 1px solid var(--right-border);
+      padding: 12px 18px;
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .confirm-row {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 13px; color: var(--right-text);
+    }
+    .confirm-row-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    /* Input bar */
+    .chat-input-bar {
+      padding: 14px 16px;
+      border-top: 1px solid var(--right-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .chat-input-bar input {
+      flex: 1;
+      padding: 11px 16px;
+      background: var(--right-bg);
+      border: 1px solid var(--right-border);
+      border-radius: 10px;
+      color: var(--right-text);
+      font-family: inherit; font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .chat-input-bar input::placeholder { color: var(--right-faint); }
+    .chat-input-bar input:focus {
+      border-color: #6366F1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+    }
+    .chat-input-bar input:disabled { opacity: 0.5; cursor: not-allowed; }
+    .send-btn {
+      width: 40px; height: 40px;
+      background: #0F172A;
+      border: none; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .send-btn svg { width: 16px; height: 16px; color: white; }
+    .send-btn:hover:not(:disabled) { background: #1E293B; transform: translateY(-1px); }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    /* ─────────────── BANNER ─────────────── */
+    .under-construction {
+      position: fixed;
+      top: 44px;
+      left: 0; right: 0;
+      z-index: 998;
+      background: #78350F;
+      border-bottom: 1px solid rgba(251,191,36,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #FDE68A;
+    }
+    .under-construction svg { width: 14px; height: 14px; flex-shrink: 0; color: #FCD34D; }
+    body { padding-top: calc(44px + 38px); }
+    .left { top: calc(44px + 38px); height: calc(100vh - 44px - 38px); }
+
+    /* ─────────────── RESPONSIVE ─────────────── */
+    @media (max-width: 860px) {
+      .layout { flex-direction: column; }
+      .left   { width: 100%; height: auto; position: static; }
+      .right  { padding: 20px; min-height: auto; align-items: stretch; }
+      .chat-card { height: calc(100vh - 180px); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="page-nav">
+  <a href="index.html" class="page-tab">
+    <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
+    Concierge Demo
+  </a>
+  <a href="experiences.html" class="page-tab">
+    <svg viewBox="0 0 14 14" fill="none"><path d="M1 3.5C1 2.67 1.67 2 2.5 2H11.5C12.33 2 13 2.67 13 3.5V9C13 9.83 12.33 10.5 11.5 10.5H8L7 13L6 10.5H2.5C1.67 10.5 1 9.83 1 9V3.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+    Web Experiences
+  </a>
+  <a href="agent.html" class="page-tab active">
+    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 12.5c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10.5 1.5l.5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5.5-1Z" fill="currentColor"/></svg>
+    AI Booking Agent
+  </a>
+</nav>
+
+<div class="under-construction">
+  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 1.5L12.5 11H1.5L7 1.5Z"/>
+    <path d="M7 5.5v3M7 10h.01"/>
+  </svg>
+  Under construction — this experience is not ready for testing yet.
+</div>
+
+<div class="layout">
+
+  <!-- ═══════════════════════════════ LEFT PANEL ═══════════════════════════════ -->
+  <aside class="left">
+
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6V12L9 16L2 12V6L9 2Z" fill="white" fill-opacity="0.9"/></svg>
+      </div>
+      <span class="brand-name">Apex</span>
+      <div class="brand-sep"></div>
+      <span class="brand-sub">
+        <span class="cp-dot"></span>
+        Powered by Chili Piper
+      </span>
+    </div>
+
+    <div class="left-copy">
+      <h1>Book a meeting through natural conversation</h1>
+      <p style="margin-top:10px">Chat with Aria — our AI agent reads your intent, qualifies your request, routes through Chili Piper Concierge, and books your meeting end-to-end. No forms. No calendar links.</p>
+    </div>
+
+    <ul class="benefits">
+      <li>
+        <div class="chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.2 7.5L8 3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        AI understands intent — collects info naturally through chat
+      </li>
+      <li>
+        <div class="chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.2 7.5L8 3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Chili Piper Concierge routes the lead and returns live slots
+      </li>
+      <li>
+        <div class="chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.2 7.5L8 3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        One click in the chat — meeting booked, invite sent instantly
+      </li>
+    </ul>
+
+    <!-- Step tracker -->
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-aside">
+          <div class="step-circle active" id="s1">1</div>
+          <div class="step-line" id="l1"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-label active" id="sl1">AI gathers intent &amp; info</div>
+          <div class="step-desc visible" id="sd1">Aria converses naturally to collect your name and email, then calls <code style="font-family:monospace;font-size:11px;color:#94A3B8">claude-sonnet-4-6</code> to determine when enough context exists to route.</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-aside">
+          <div class="step-circle" id="s2">2</div>
+          <div class="step-line" id="l2"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-label" id="sl2">Chili Piper routes &amp; returns slots</div>
+          <div class="step-desc" id="sd2">The AI calls <code style="font-family:monospace;font-size:11px;color:#94A3B8">/routers/{slug}/rest</code> — routing rules fire, a rep is assigned, and available times appear directly in the chat.</div>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-aside">
+          <div class="step-circle" id="s3">3</div>
+        </div>
+        <div class="step-body">
+          <div class="step-label" id="sl3">Pick a time — meeting booked</div>
+          <div class="step-desc" id="sd3">Clicking a slot fires <code style="font-family:monospace;font-size:11px;color:#94A3B8">/routing/{id}/schedule-simple</code>. Calendar invite sent. No handoff, no link.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Console -->
+    <div class="console">
+      <div class="console-bar">
+        <div class="c-dot c-dot-r"></div>
+        <div class="c-dot c-dot-y"></div>
+        <div class="c-dot c-dot-g"></div>
+        <span class="console-title">Claude + Chili Piper API Console</span>
+      </div>
+      <div class="console-body" id="consoleBody"></div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════════════ RIGHT PANEL ═══════════════════════════════ -->
+  <main class="right">
+
+    <div class="chat-card">
+
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="agent-avatar">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="16" height="10" rx="3"/>
+            <path d="M7 6V5a3 3 0 016 0v1"/>
+            <circle cx="7.5" cy="11" r="1" fill="white" stroke="none"/>
+            <circle cx="12.5" cy="11" r="1" fill="white" stroke="none"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <div class="agent-name">Aria</div>
+          <div class="agent-status">
+            <div class="status-dot"></div>
+            <span>AI Booking Agent · Apex</span>
+          </div>
+        </div>
+        <button class="new-chat-btn" onclick="resetChat()">New Chat</button>
+      </div>
+
+      <!-- Messages -->
+      <div class="chat-messages" id="chatMessages"></div>
+
+      <!-- Input bar -->
+      <div class="chat-input-bar">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Reply to Aria…"
+          onkeydown="if(event.key==='Enter')sendMessage()"
+        >
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h12M10 4l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+  /* ─────────────── STATE ─────────────── */
+  const S = {
+    messages:  [],
+    tz:        Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York',
+    routeData: null,
+    formData:  null,
+    step:      1,
+    busy:      false,
+  };
+
+  const GREETING = "Hi there! I'm Aria, your Apex demo scheduler. What's bringing you to Apex today?";
+
+  /* ─────────────── CONSOLE HELPERS ─────────────── */
+  function con(html) {
+    document.getElementById('consoleBody').innerHTML = html;
+  }
+
+  function consoleIdle() {
+    con(`<span class="c-dim">// Claude Sonnet 4.6 — agent mode</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">POST</span> <span class="c-url">api.anthropic.com/v1/messages</span>
+  <span class="c-key">model</span>  <span class="c-str">"claude-sonnet-4-6"</span>
+  <span class="c-key">tools</span>  <span class="c-dim">[</span><span class="c-str">"route_lead"</span><span class="c-dim">]</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-dim">// Listening for intent…</span>
+<span class="c-dim">// Collecting: name · email</span>`);
+  }
+
+  function consoleThinking() {
+    con(`<span class="c-acc">▶ Claude processing…</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">POST</span> <span class="c-url">api.anthropic.com/v1/messages</span>
+  <span class="c-key">messages</span>  <span class="c-num">${S.messages.length}</span>
+  <span class="c-key">max_tokens</span> <span class="c-num">256</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-dim">// Evaluating intent…</span>`);
+  }
+
+  function consoleRouting() {
+    con(`<span class="c-acc">▶ Routing lead via Chili Piper…</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">POST</span> <span class="c-url">/v1/org/concierge/routers</span>
+     <span class="c-url">/inbound-override-router---marketo</span>
+     <span class="c-url">/rest</span>
+<span class="c-dim">{</span>
+  <span class="c-key">"form"</span><span class="c-dim">:</span>     <span class="c-dim">{ email, firstname, … }</span>
+  <span class="c-key">"interval"</span><span class="c-dim">:</span> <span class="c-dim">{ "duration": "7 days" }</span>
+<span class="c-dim">}</span>`);
+  }
+
+  function consoleRouted(routeId, count) {
+    const short = routeId ? routeId.slice(0, 8) + '…' : '—';
+    con(`<span class="c-ok">✓ 200</span>  <span class="c-key">POST</span> <span class="c-url">/routers/…/rest</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">routeId</span>           <span class="c-str">"${short}"</span>
+<span class="c-key">schedulingAllowed</span> <span class="c-ok">true</span>
+<span class="c-key">startTimes</span>        <span class="c-num">${count}</span> <span class="c-dim">slots available</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-dim">NEXT</span>  <span class="c-key">POST</span> <span class="c-url">/v1/org/concierge/routing</span>
+      <span class="c-url">  /{routingId}/schedule-simple</span>`);
+  }
+
+  function consoleBooking(routeId, startTime) {
+    const short = routeId ? routeId.slice(0, 8) + '…' : '—';
+    con(`<span class="c-acc">▶ Booking meeting…</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">POST</span> <span class="c-url">/v1/org/concierge/routing</span>
+     <span class="c-url">/${short}/schedule-simple</span>
+<span class="c-dim">{</span>
+  <span class="c-key">"startTime"</span><span class="c-dim">:</span> <span class="c-str">"${startTime || '…'}"</span>
+<span class="c-dim">}</span>`);
+  }
+
+  function consoleBooked(id) {
+    const short = id && id !== '—' ? String(id).slice(0, 8) + '…' : id;
+    con(`<span class="c-ok">✓ 200</span>  <span class="c-key">POST</span> <span class="c-url">/routing/…/schedule-simple</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-key">status</span>  <span class="c-ok">booked</span>
+<span class="c-key">id</span>      <span class="c-str">"${short}"</span>
+<span class="c-dim">──────────────────────────────────</span>
+<span class="c-ok">✓ Meeting confirmed &amp; invite sent</span>`);
+  }
+
+  /* ─────────────── STEP TRACKER ─────────────── */
+  function setStep(n) {
+    [1, 2, 3].forEach(i => {
+      const circle = document.getElementById(`s${i}`);
+      const label  = document.getElementById(`sl${i}`);
+      const desc   = document.getElementById(`sd${i}`);
+      const line   = document.getElementById(`l${i}`);
+
+      circle.classList.remove('active', 'done');
+      label.classList.remove('active');
+      if (desc) desc.classList.remove('visible');
+      if (line) line.classList.remove('done');
+
+      if (i < n) {
+        circle.classList.add('done');
+        circle.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        if (line) line.classList.add('done');
+      } else if (i === n) {
+        circle.classList.add('active');
+        circle.textContent = i;
+        label.classList.add('active');
+        if (desc) desc.classList.add('visible');
+      } else {
+        circle.textContent = i;
+      }
+    });
+  }
+
+  /* ─────────────── TIME HELPERS ─────────────── */
+  function fmtTime(iso, tz) {
+    return new Date(iso).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', timeZone: tz
+    });
+  }
+  function fmtDate(iso, tz) {
+    return new Date(iso).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric', timeZone: tz
+    });
+  }
+  function fmtFull(iso, tz) {
+    return new Date(iso).toLocaleString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', timeZone: tz
+    });
+  }
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ─────────────── RENDER HELPERS ─────────────── */
+  function scrollToBottom() {
+    const el = document.getElementById('chatMessages');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function agentAvatar() {
+    return `<div class="msg-avatar">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="16" height="10" rx="3"/>
+        <path d="M7 6V5a3 3 0 016 0v1"/>
+        <circle cx="7.5" cy="11" r="1" fill="white" stroke="none"/>
+        <circle cx="12.5" cy="11" r="1" fill="white" stroke="none"/>
+      </svg>
+    </div>`;
+  }
+
+  function addAgentMessage(text) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg-wrap msg-agent';
+    div.innerHTML = `${agentAvatar()}<div class="msg-bubble">${escHtml(text)}</div>`;
+    container.appendChild(div);
+    scrollToBottom();
+    return div;
+  }
+
+  function addUserMessage(text) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg-wrap msg-user';
+    div.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
+    container.appendChild(div);
+    scrollToBottom();
+    return div;
+  }
+
+  function showTyping() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg-wrap msg-agent';
+    div.id = 'typingIndicator';
+    div.innerHTML = `${agentAvatar()}<div class="msg-bubble typing-bubble"><span></span><span></span><span></span></div>`;
+    container.appendChild(div);
+    scrollToBottom();
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  /* ─────────────── SLOT RENDERING ─────────────── */
+  function normalizeSlot(s) {
+    if (typeof s === 'string') return s;
+    return s?.start || s?.startTime || null;
+  }
+
+  function addSlotMessage(introText, slots) {
+    // Text bubble first
+    addAgentMessage(introText);
+
+    // Group by day
+    const groups = new Map();
+    slots.forEach(s => {
+      const iso = normalizeSlot(s);
+      if (!iso) return;
+      const day = fmtDate(iso, S.tz);
+      if (!groups.has(day)) groups.set(day, []);
+      groups.get(day).push(iso);
+    });
+
+    let slotsHtml = `<div class="slot-intro">Times shown in <strong>${S.tz.replace(/_/g,' ')}</strong></div>`;
+    groups.forEach((isos, day) => {
+      slotsHtml += `<div class="slot-day-label">${day}</div><div class="slot-row">`;
+      isos.forEach(iso => {
+        slotsHtml += `<button class="chat-slot-btn" data-iso="${iso}" onclick="pickSlot('${iso}', this)">${fmtTime(iso, S.tz)}</button>`;
+      });
+      slotsHtml += `</div>`;
+    });
+
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg-wrap msg-agent';
+    div.innerHTML = `${agentAvatar()}<div class="msg-bubble msg-slots">${slotsHtml}</div>`;
+    container.appendChild(div);
+    scrollToBottom();
+  }
+
+  function addConfirmationMessage(confirmed) {
+    const dateStr = fmtDate(confirmed.startTime, confirmed.tz);
+    const timeStr = fmtTime(confirmed.startTime, confirmed.tz);
+    const email   = confirmed.lead?.email || '';
+
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg-wrap msg-agent';
+    div.innerHTML = `
+      ${agentAvatar()}
+      <div class="msg-bubble msg-confirm">
+        <div class="confirm-head">
+          <div class="confirm-check">
+            <svg viewBox="0 0 22 22" fill="none"><path d="M4 11L9 16L18 6" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="confirm-title">You're booked!</div>
+          <div class="confirm-note">A calendar invite is on its way to your inbox.</div>
+        </div>
+        <div class="confirm-rows">
+          <div class="confirm-row"><span class="confirm-row-icon">📅</span>${escHtml(dateStr)}</div>
+          <div class="confirm-row"><span class="confirm-row-icon">⏰</span>${escHtml(timeStr)} · ${escHtml(confirmed.tz)}</div>
+          <div class="confirm-row"><span class="confirm-row-icon">📧</span>${escHtml(email)}</div>
+        </div>
+      </div>`;
+    container.appendChild(div);
+    scrollToBottom();
+  }
+
+  /* ─────────────── SEND MESSAGE ─────────────── */
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text  = input.value.trim();
+    if (!text || S.busy) return;
+
+    input.value = '';
+    addUserMessage(text);
+    S.messages = [...S.messages, { role: 'user', content: text }];
+
+    await callAgent();
+  }
+
+  /* ─────────────── CALL AI AGENT ─────────────── */
+  async function callAgent() {
+    S.busy = true;
+    setBusy(true);
+    consoleThinking();
+    showTyping();
+
+    try {
+      const res  = await fetch('/api/ai-agent', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ messages: S.messages, tz: S.tz })
+      });
+      const data = await res.json();
+
+      hideTyping();
+
+      if (data.error) {
+        addAgentMessage('Sorry, I ran into a problem. Please try again.');
+        consoleIdle();
+        return;
+      }
+
+      S.messages = data.messages || S.messages;
+
+      if (data.routeData) {
+        S.routeData = data.routeData;
+        S.formData  = data.formData;
+        S.step      = 2;
+        setStep(2);
+        consoleRouted(data.routeData.routeId, data.routeData.slots.length);
+        addSlotMessage(data.reply, data.routeData.slots);
+      } else {
+        addAgentMessage(data.reply);
+        consoleIdle();
+      }
+
+    } catch (err) {
+      hideTyping();
+      addAgentMessage('Connection error. Please refresh and try again.');
+    } finally {
+      S.busy = false;
+      setBusy(false);
+    }
+  }
+
+  /* ─────────────── PICK A SLOT ─────────────── */
+  async function pickSlot(iso, el) {
+    if (!S.routeData || !S.formData || S.busy) return;
+
+    // Lock all slot buttons
+    document.querySelectorAll('.chat-slot-btn').forEach(b => {
+      b.disabled = true;
+    });
+    el.classList.add('selected');
+
+    // User "message" showing chosen time
+    addUserMessage(`Book me the ${fmtFull(iso, S.tz)} slot`);
+
+    consoleBooking(S.routeData.routeId, iso);
+    S.busy = true;
+    setBusy(true);
+    showTyping();
+
+    try {
+      const res  = await fetch('/api/ai-agent', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          mode:      'book',
+          routingId: S.routeData.routeId,
+          startTime: iso,
+          tz:        S.tz,
+          lead: {
+            email:     S.formData.email,
+            firstName: S.formData.firstName,
+            lastName:  S.formData.lastName,
+          }
+        })
+      });
+      const data = await res.json();
+
+      hideTyping();
+
+      if (data.error) {
+        addAgentMessage("Sorry, I couldn't book that slot. Please pick a different time.");
+        document.querySelectorAll('.chat-slot-btn').forEach(b => {
+          b.disabled = false;
+          b.classList.remove('selected');
+        });
+        return;
+      }
+
+      S.step = 3;
+      setStep(3);
+      consoleBooked(data.confirmed?.id);
+      addConfirmationMessage(data.confirmed);
+
+      // Lock input — conversation is done
+      document.getElementById('chatInput').disabled = true;
+      document.getElementById('sendBtn').disabled   = true;
+
+    } catch (err) {
+      hideTyping();
+      addAgentMessage('Connection error. Please try again.');
+      document.querySelectorAll('.chat-slot-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('selected');
+      });
+    } finally {
+      S.busy = false;
+      setBusy(false);
+    }
+  }
+
+  /* ─────────────── BUSY STATE ─────────────── */
+  function setBusy(busy) {
+    document.getElementById('chatInput').disabled = busy;
+    document.getElementById('sendBtn').disabled   = busy;
+  }
+
+  /* ─────────────── RESET ─────────────── */
+  function resetChat() {
+    S.messages  = [];
+    S.routeData = null;
+    S.formData  = null;
+    S.step      = 1;
+    S.busy      = false;
+
+    document.getElementById('chatMessages').innerHTML = '';
+    document.getElementById('chatInput').disabled     = false;
+    document.getElementById('sendBtn').disabled       = false;
+
+    init();
+  }
+
+  /* ─────────────── INIT ─────────────── */
+  function init() {
+    setStep(1);
+    consoleIdle();
+
+    // Render initial greeting without an API call
+    addAgentMessage(GREETING);
+
+    // Prime the messages array so Claude sees its own greeting as context
+    S.messages = [
+      { role: 'assistant', content: [{ type: 'text', text: GREETING }] }
+    ];
+  }
+
+  init();
+</script>
+
+</body>
+</html>
